@@ -1,4 +1,3 @@
-//
 #include<iostream>
 #include<Windows.h>
 #include<conio.h>
@@ -164,8 +163,8 @@ public:
 		srand(time(0));
 		arenaWidth=x;
 		arenaHeight=y;
-		posX=rand()%arenaWidth;
-		posY=rand()%arenaHeight;
+		posX=rand()%(arenaWidth-1)+1;
+		posY=rand()%(arenaHeight-1)+1;
 		this->s=s;
 		//
 		generate();
@@ -177,8 +176,8 @@ public:
 		srand(time(0));
 		while(s->isOccupied(posX,posY) || (s->getX()==posX && s->getY()==posY))
 		{
-			posX=rand()%arenaWidth;
-			posY=rand()%arenaHeight;
+			posX=rand()%(arenaWidth-1)+1;
+			posY=rand()%(arenaHeight-1)+1;
 		}
 	}
 	
@@ -313,15 +312,23 @@ public:
 	}
 };
 
-int main()
+void instructions_page()
 {
-	
-	Game g(40,40);
+	system("cls");
+	cout<<"Controls:"<<endl<<"W : UP"<<endl<<"A : LEFT"<<endl<<"S : DOWN"<<endl<<"D : RIGHT"<<endl<<"P : PAUSE"<<endl<<"ANY KEY : UNPAUSE"<<endl;
+	cout<<"Press any key to start the game!!"<<endl;
+	getch();
+}
+
+void gameloop(Game *g)
+{
 	int level=1,base_speed=500;
 
-	cout<<"Choose a level:(1-10)";
+	system("cls");
+	cout<<"Choose a level:(1-10)"<<endl;
 	cin>>level;
 
+	instructions_page();
 	if(level>0 && level<11)
 		base_speed/=level;
 	else
@@ -329,16 +336,32 @@ int main()
 
 	while(1)
 	{
-		if(g.getQuit())
+		if(g->getQuit())
 			break;
 		system("cls");
-		g.draw();
-		g.move();
-		g.check();
+		g->draw();
+		g->move();
+		g->check();
 		Sleep(base_speed);
 	}
-	
-	cout<<endl<<endl<<"\t\t\t"<<"   GAME OVER!!"<<endl<<"\t\t\tYour Score is "<<g.getScore();
-	while(1);
+}
+
+int main()
+{
+	Game *g;
+	while(1)
+	{
+		g=new Game(40,40);
+		gameloop(g);
+		cout<<endl<<endl<<"\t\t\t"<<"   GAME OVER!!"<<endl<<"\t\t\tYour Score is "<<g->getScore();
+		cout<<endl<<"\t\tpress 'R' to Restart,'E' to Exit"<<endl;
+		char ch;
+		cin>>ch;
+		if(ch=='E')
+		{
+			delete g;
+			break;
+		}
+	}
 	return 0;
 }
