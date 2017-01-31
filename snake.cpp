@@ -1,5 +1,5 @@
 /**************************************************************************************************************************
-													TEXT BASED SNAKE GAME
+							TEXT BASED SNAKE GAME
 This game has been tested on Windows 7 with gcc compiler(version 5.3.0)
 For proper view,set command prompt window size to 75x45
 ***************************************************************************************************************************/
