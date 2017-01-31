@@ -1,9 +1,16 @@
+/**************************************************************************************************************************
+													TEXT BASED SNAKE GAME
+This game has been tested on Windows 7 with gcc compiler(version 5.3.0)
+For proper view,set command prompt window size to 75x45
+***************************************************************************************************************************/
+
 #include<iostream>
 #include<Windows.h>
 #include<conio.h>
 #include<time.h>
 #include<set>
 #include<deque>
+#include<stdio.h>
 
 using namespace std;
 
@@ -13,10 +20,10 @@ class Snake
 {
 private:
 	int x,y,posX,posY;
-	set<pair<int,int>> occupied;
-	deque<pair<int,int>> body;
+	set<pair<int,int> > occupied;			//set of coordinates occupied by snake's body
+	deque<pair<int,int> > body;
 	direction dir,lastdir;
-	bool grow;
+	bool grow;								//flag to indicate if the snake should grow in size or not
 
 	void extend(int x,int y)				//extends the snake body in the direction of head
 	{
@@ -29,19 +36,10 @@ public:
 	{
 		posX=x;
 		posY=y;
-		//speed=1;
 		dir=STOP;
 		lastdir=UP;
-		//extend(x,y);
 		extend(x+1,y);
 		grow=false;
-		//
-		//extend(x+1,y);
-	}
-
-	~Snake()
-	{
-		cout<<"Destructor called";
 	}
 
 	void move()							//moves the snake in the direction specified
@@ -56,9 +54,6 @@ public:
 						occupied.erase(*body.begin());
 						body.pop_front();
 					}
-					//
-					//else
-						//extend(((body.rbegin())->first)+1,((body.rbegin())->second));
 					break;
 		case DOWN:	extend(posX,posY);
 					posX++;
@@ -67,8 +62,6 @@ public:
 						occupied.erase(*body.begin());
 						body.pop_front();
 					}
-					//else
-						//extend(((body.rbegin())->first)-1,((body.rbegin())->second));
 					break;
 		case LEFT:	extend(posX,posY);
 					posY--;		
@@ -77,8 +70,6 @@ public:
 						occupied.erase(*body.begin());
 						body.pop_front();
 					}	
-					//else
-						//extend(((body.rbegin())->first)+1,((body.rbegin())->second));
 					break;
 		case RIGHT:	extend(posX,posY);
 					posY++;
@@ -87,20 +78,18 @@ public:
 						occupied.erase(*body.begin());
 						body.pop_front();
 					}
-					//else
-						//extend(((body.rbegin())->first)+1,((body.rbegin())->second));
 					break;
 		}
 	}
 
-	bool isOccupied(int x,int y)					//
+	bool isOccupied(int x,int y)						//checks if coordinate (x,y) is occupied by snake's body
 	{
 		if(occupied.find(make_pair(x,y))==occupied.end())
 			return false;
 		return true;
 	}
 
-	bool getGrow()
+	bool getGrow()		
 	{
 		return grow;
 	}
@@ -109,11 +98,6 @@ public:
 	{
 		grow=f;
 	}
-
-	/*inline int getSpeed()
-	{
-		return speed;
-	}*/
 
 	inline direction getDirection()
 	{
@@ -129,11 +113,6 @@ public:
 	{
 		return posY;
 	}
-
-	/*inline void setSpeed(int s)
-	{
-		speed=s;
-	}*/
 
 	inline void setDirection(direction d)
 	{
@@ -166,15 +145,13 @@ public:
 		posX=rand()%(arenaWidth-1)+1;
 		posY=rand()%(arenaHeight-1)+1;
 		this->s=s;
-		//
 		generate();
-
 	}
 	
-	void generate()
+	void generate()									//produces food at a random location on the arena
 	{
 		srand(time(0));
-		while(s->isOccupied(posX,posY) || (s->getX()==posX && s->getY()==posY))
+		while(s->isOccupied(posX,posY) || (s->getX()==posX && s->getY()==posY))		//so that food is not generated on snake's body
 		{
 			posX=rand()%(arenaWidth-1)+1;
 			posY=rand()%(arenaHeight-1)+1;
@@ -198,14 +175,14 @@ private:
 	Snake *s;
 	Food *f;
 	int arenaWidth,arenaHeight;
-	int score;
-	bool quit;
+	int score;									
+	bool quit;									//set if 'q' key is pressed
 
 public:
 	Game(int x,int y)
 	{
-		s=new Snake(x/2,y/2);
-		f=new Food(x,y,s);
+		s=new Snake(x/2,y/2);					//initialise snake at the center of arena
+		f=new Food(x,y,s);						//produce food at a random location on arena
 		arenaWidth=x;
 		arenaHeight=y;
 		f->generate();
@@ -213,51 +190,49 @@ public:
 		score=0;
 	}
 
-	void draw()
+	void draw()											//draws pixels on the arena
 	{
 		for(int i=0;i<=arenaWidth;i++)
 		{
 			for(int j=0;j<=arenaHeight;j++)
 			{
-				if(i==0 || j==0 || i==arenaWidth || j==arenaHeight)
+				if(i==0 || j==0 || i==arenaWidth || j==arenaHeight)		//arena boundary
 					cout<<"#";
-				else if(i==s->getX() && j==s->getY())
+				else if(i==s->getX() && j==s->getY())					//snake head
 					cout<<"X";
-				else if(s->isOccupied(i,j))
+				else if(s->isOccupied(i,j))								//snake body
 					cout<<"0";
-				else if(i==f->getX() && j==f->getY())
+				else if(i==f->getX() && j==f->getY())					//food
 					cout<<"*";
 				else
 					cout<<" ";
 				//
-				//Sleep(20);
+				//Sleep(20);								//frame delay,introduces flickering when set to 0ms,but inproves game play 
 			}
 			cout<<endl;
 		}
-		cout<<"Score:"<<score; 
+		cout<<"Score: "<<score; 
 	}
 	
 	void move()
 	{
-		char ch='c';
+		char ch='c';									//by default,continue.Also,implements unpause on any key pressed after pausing
 
-		if(kbhit())
+		if(kbhit())										//checks if any key is pressed
 		{
 			ch=getch();
 		}
 
-		if(s->getX()==f->getX() && s->getY()==f->getY())
+		if(s->getX()==f->getX() && s->getY()==f->getY())	//checks if snake has eaten food
 		{
 			s->setgrow(true);
 		}
 
-		switch(ch)
+		switch(ch)										//action to be performed on various key presses
 		{
-		case 'c':	//
-					//s->move(true);
-					s->move();
+		case 'c':	s->move();							//default
 					break;
-		case 'w':	if(s->getDirection()!=DOWN)
+		case 'w':	if(s->getDirection()!=DOWN)			//so that snake doesnt make a 180-degree turn
 						s->setDirection(UP);
 					s->move();
 					break;
@@ -273,23 +248,24 @@ public:
 						s->setDirection(RIGHT);
 					s->move();
 					break;
-		case 'q':	quit=true;
+		case 'q':	quit=true;							//quit game
 					break;
-		case 'p':	s->setDirection(STOP);
+		case 'p':	s->setDirection(STOP);				//pause game
 					s->move();
 					break;
 		}
 
-		if(s->getGrow()==true)
+		if(s->getGrow()==true)							//check if snake has eaten food
 		{
-			s->setgrow(false);
-			score+=10;
-			f->generate();
+			s->setgrow(false);							//so that snake doesnt grow indefinitely
+			score+=10;									//update score
+			f->generate();								//generate food at relevant location,as food is now eaten
 		}
 	}
 
-	void check()
+	void gameover_check()								//update quit flag if game is over
 	{
+		//check if snake head collides with walls of arena or the snake's body
 		if(s->getX()==0 || s->getY()==0 || s->getX()==arenaWidth || s->getY()==arenaHeight || s->isOccupied(s->getX(),s->getY()))
 			quit=true;
 	}
@@ -306,13 +282,12 @@ public:
 
 	~Game()
 	{
-		cout<<"Game destructor called!!"<<endl;
 		delete s;
 		delete f;
 	}
 };
 
-void instructions_page()
+void instructions_page()					//displays the indtruction page
 {
 	system("cls");
 	cout<<"Controls:"<<endl<<"W : UP"<<endl<<"A : LEFT"<<endl<<"S : DOWN"<<endl<<"D : RIGHT"<<endl<<"P : PAUSE"<<endl<<"ANY KEY : UNPAUSE"<<endl;
@@ -322,17 +297,21 @@ void instructions_page()
 
 void gameloop(Game *g)
 {
-	int level=1,base_speed=500;
+	int level,base_frame_delay=500;
+	
+	fflush(stdin);							//clears input buffer if more than one character was inputted
 
 	system("cls");
 	cout<<"Choose a level:(1-10)"<<endl;
 	cin>>level;
 
+	fflush(stdin);							//clears input buffer if more than one character was inputted
+	
 	instructions_page();
 	if(level>0 && level<11)
-		base_speed/=level;
+		base_frame_delay/=level;
 	else
-		base_speed=0;					//rebels wont be dissappointed
+		base_frame_delay=0;					//if any other level is chosen,sets speed to maximum
 
 	while(1)
 	{
@@ -341,8 +320,8 @@ void gameloop(Game *g)
 		system("cls");
 		g->draw();
 		g->move();
-		g->check();
-		Sleep(base_speed);
+		g->gameover_check();
+		Sleep(base_frame_delay);
 	}
 }
 
@@ -355,9 +334,11 @@ int main()
 		gameloop(g);
 		cout<<endl<<endl<<"\t\t\t"<<"   GAME OVER!!"<<endl<<"\t\t\tYour Score is "<<g->getScore();
 		cout<<endl<<"\t\tpress 'R' to Restart,'E' to Exit"<<endl;
+		
+		fflush(stdin);							//clears input buffer if more than one character was inputted
 		char ch;
 		cin>>ch;
-		if(ch=='E')
+		if(ch=='E' || ch=='e')
 		{
 			delete g;
 			break;
