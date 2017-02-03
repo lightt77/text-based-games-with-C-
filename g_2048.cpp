@@ -1,7 +1,3 @@
-/****************************************************************************************************************************
-														2048 game
-****************************************************************************************************************************/
-
 #include<iostream>
 #include<time.h>
 #include<Windows.h>
@@ -83,14 +79,24 @@ public:
 			for(int j=0;j<dimension;j++)
 			{
 				if(matrix[i][j]==0)
-					cout<<" ";
+					cout<<"    |";
 				else
+				{
 					cout<<matrix[i][j];
-				cout<<" ";
+					if(matrix[i][j]<10)
+						cout<<"   |";
+					else if(matrix[i][j]<100)
+						cout<<"  |";
+					else if(matrix[i][j]<1000)
+						cout<<" |";
+					else if(matrix[i][j]<10000)
+						cout<<"|";
+				}
+				//cout<<" ";
 			}
 			cout<<endl;
 		}
-		cout<<"Score : "<<score<<endl;
+		cout<<endl<<"Score : "<<score<<endl;
 	}
 
 	void get_input()
@@ -124,6 +130,7 @@ public:
 
 	void move(char ch)				//note:remember to shift some of the functions to private
 	{
+		/*
 		if(ch=='w')
 		{
 			for(int i=dimension-1;i>=1;i--)
@@ -153,7 +160,224 @@ public:
 					break;
 			}
 		}
-		
+		*/
+
+		if(key_pressed=='w')
+		{
+			for(int j=0;j<dimension;j++)
+			{
+				for(int i=1;i<dimension;i++)
+				{
+					if(matrix[i][j]==0)
+						continue;
+					else if(matrix[i][j]==matrix[i-1][j])
+					{
+						matrix[i-1][j]*=2;
+						vacant.insert(make_pair(i,j));
+						matrix[i][j]=0;
+						score+=matrix[i-1][j];
+					}
+					else if(matrix[i-1][j]==0)
+					{
+						int p=i-1,q=j;
+
+						while(inside_matrix(p,q) && matrix[p][q]==0)
+						{
+							p--;
+						}
+
+						if(!inside_matrix(p,q))
+							p++;
+
+						if(matrix[p][q]==matrix[i][j])
+						{
+							matrix[p][q]*=2;
+							vacant.insert(make_pair(i,j));
+							matrix[i][j]=0;
+							score+=matrix[p][q];
+						}
+						else if(matrix[p][q]==0)
+						{
+							matrix[p][q]=matrix[i][j];
+							vacant.erase(make_pair(p,q));
+							vacant.insert(make_pair(i,j));
+							matrix[i][j]=0;
+						}
+						else
+						{
+							p++;
+							matrix[p][q]=matrix[i][j];
+							vacant.insert(make_pair(i,j));
+							vacant.emplace(make_pair(p,q));
+							matrix[i][j]=0;
+						}
+					}
+
+				}
+			}
+		}
+		else if(key_pressed=='s')
+		{
+			for(int j=0;j<dimension;j++)
+			{
+				for(int i=dimension-2;i>=0;i--)
+				{
+					if(matrix[i][j]==0)
+						continue;
+					else if(matrix[i][j]==matrix[i+1][j])
+					{
+						matrix[i+1][j]*=2;
+						vacant.insert(make_pair(i,j));
+						matrix[i][j]=0;
+						score+=matrix[i+1][j];
+					}
+					else if(matrix[i+1][j]==0)
+					{
+						int p=i+1,q=j;
+
+						while(inside_matrix(p,q) && matrix[p][q]==0)
+						{
+							p++;
+						}
+
+						if(!inside_matrix(p,q))
+							p--;
+
+						if(matrix[p][q]==matrix[i][j])
+						{
+							matrix[p][q]*=2;
+							vacant.insert(make_pair(i,j));
+							matrix[i][j]=0;
+							score+=matrix[p][q];
+						}
+						else if(matrix[p][q]==0)
+						{
+							matrix[p][q]=matrix[i][j];
+							vacant.erase(make_pair(p,q));
+							vacant.insert(make_pair(i,j));
+							matrix[i][j]=0;
+						}
+						else
+						{
+							p--;
+							matrix[p][q]=matrix[i][j];
+							vacant.insert(make_pair(i,j));
+							vacant.emplace(make_pair(p,q));
+							matrix[i][j]=0;
+						}
+					}
+
+				}
+			}
+		} 
+		else if(key_pressed=='a')
+		{
+			for(int i=0;i<dimension;i++)
+			{
+				for(int j=1;j<dimension;j++)
+				{
+					if(matrix[i][j]==0)
+						continue;
+					else if(matrix[i][j]==matrix[i][j-1])
+					{
+						matrix[i][j-1]*=2;
+						vacant.insert(make_pair(i,j));
+						matrix[i][j]=0;
+						score+=matrix[i][j-1];
+					}
+					else if(matrix[i][j-1]==0)
+					{
+						int p=i,q=j-1;
+
+						while(inside_matrix(p,q) && matrix[p][q]==0)
+						{
+							q--;
+						}
+
+						if(!inside_matrix(p,q))
+							q++;
+
+						if(matrix[p][q]==matrix[i][j])
+						{
+							matrix[p][q]*=2;
+							vacant.insert(make_pair(i,j));
+							matrix[i][j]=0;
+							score+=matrix[p][q];
+						}
+						else if(matrix[p][q]==0)
+						{
+							matrix[p][q]=matrix[i][j];
+							vacant.erase(make_pair(p,q));
+							vacant.insert(make_pair(i,j));
+							matrix[i][j]=0;
+						}
+						else
+						{
+							q++;
+							matrix[p][q]=matrix[i][j];
+							vacant.insert(make_pair(i,j));
+							vacant.emplace(make_pair(p,q));
+							matrix[i][j]=0;
+						}
+					}
+
+				}
+			}
+		}
+		else if(key_pressed=='d')
+		{
+			for(int i=0;i<dimension;i++)
+			{
+				for(int j=dimension-2;j>=0;j--)
+				{
+					if(matrix[i][j]==0)
+						continue;
+					else if(matrix[i][j]==matrix[i][j+1])
+					{
+						matrix[i][j+1]*=2;
+						vacant.insert(make_pair(i,j));
+						matrix[i][j]=0;
+						score+=matrix[i][j+1];
+					}
+					else if(matrix[i][j+1]==0)
+					{
+						int p=i,q=j+1;
+
+						while(inside_matrix(p,q) && matrix[p][q]==0)
+						{
+							q++;
+						}
+
+						if(!inside_matrix(p,q))
+							q--;
+
+						if(matrix[p][q]==matrix[i][j])
+						{
+							matrix[p][q]*=2;
+							vacant.insert(make_pair(i,j));
+							matrix[i][j]=0;
+							score+=matrix[p][q];
+						}
+						else if(matrix[p][q]==0)
+						{
+							matrix[p][q]=matrix[i][j];
+							vacant.erase(make_pair(p,q));
+							vacant.insert(make_pair(i,j));
+							matrix[i][j]=0;
+						}
+						else
+						{
+							q--;
+							matrix[p][q]=matrix[i][j];
+							vacant.insert(make_pair(i,j));
+							vacant.emplace(make_pair(p,q));
+							matrix[i][j]=0;
+						}
+					}
+
+				}
+			}
+		} 
 
 	}
 
@@ -208,7 +432,7 @@ void game_loop(g_2048 *g)
 
 int main()
 {
-	g_2048 *g=new g_2048(4);
+	g_2048 *g=new g_2048(3);
 
 	game_loop(g);
 
