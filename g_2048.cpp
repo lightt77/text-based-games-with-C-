@@ -128,87 +128,56 @@ public:
 		return (i>=0 && i<dimension && j>=0 && j<dimension);
 	}
 
-	void move(char ch)				//note:remember to shift some of the functions to private
+	void move(char ch)				//moves and combines tiles by value,according to the key pressed
 	{
-		/*
-		if(ch=='w')
-		{
-			for(int i=dimension-1;i>=1;i--)
-			{
-				bool breakouterloop=false;
-				for(int j=0;j<dimension;j++)
-				{
-					if(matrix[i][j]==0)
-						continue;
-					if(matrix[i-1][j]==0)
-					{
-						vacant.erase(make_pair(i-1,j));
-						matrix[i-1][j]=matrix[i][j];
-						vacant.insert(make_pair(i,j));
-						matrix[i][j]=0;
-					}
-					else if(matrix[i-1][j]==matrix[i][j])
-					{
-						matrix[i-1][j]*=2;
-						score+=matrix[i-1][j];
-						matrix[i][j]=0;
-						vacant.insert(make_pair(i,j));
-						breakouterloop=true;
-					}
-				}
-				if(breakouterloop)
-					break;
-			}
-		}
-		*/
-
 		if(key_pressed=='w')
 		{
-			for(int j=0;j<dimension;j++)
+			for(int j=0;j<dimension;j++)		//move each tile column-wise in vertical direction starting with first column.
 			{
+				//first tile in a column moves up the first and then other tiles in the column follow
 				for(int i=1;i<dimension;i++)
 				{
-					if(matrix[i][j]==0)
+					if(matrix[i][j]==0)					//if tile is vacant,do nothing
 						continue;
-					else if(matrix[i][j]==matrix[i-1][j])
+					else if(matrix[i][j]==matrix[i-1][j])		//if tile value is equal to upper tile value,merge the two of them in to a tile of twice the value
 					{
 						matrix[i-1][j]*=2;
 						vacant.insert(make_pair(i,j));
 						matrix[i][j]=0;
 						score+=matrix[i-1][j];
 					}
-					else if(matrix[i-1][j]==0)
+					else if(matrix[i-1][j]==0)					//if upper tile is vacant
 					{
 						int p=i-1,q=j;
 
-						while(inside_matrix(p,q) && matrix[p][q]==0)
+						while(inside_matrix(p,q) && matrix[p][q]==0)		//move upwards while upper tile is vacant,stop when upper tile is occupied or when board border is reached
 						{
 							p--;
 						}
 
-						if(!inside_matrix(p,q))
+						if(!inside_matrix(p,q))						//move p into the board if it goes out of the board
 							p++;
 
-						if(matrix[p][q]==matrix[i][j])
+						if(matrix[p][q]==matrix[i][j])				//if value of vertically next occupied tile is equal to given tile,merge the two
 						{
 							matrix[p][q]*=2;
 							vacant.insert(make_pair(i,j));
 							matrix[i][j]=0;
 							score+=matrix[p][q];
 						}
-						else if(matrix[p][q]==0)
+						else if(matrix[p][q]==0)					//if tile at the vertical extreme is vacant,shift current tile to its position
 						{
 							matrix[p][q]=matrix[i][j];
 							vacant.erase(make_pair(p,q));
 							vacant.insert(make_pair(i,j));
 							matrix[i][j]=0;
 						}
-						else
+						else                                       //if tile at vertical extreme is of different value,move the current tile to a position vertically below the extreme tile
 						{
 							p++;
 							matrix[p][q]=matrix[i][j];
 							vacant.insert(make_pair(i,j));
-							vacant.emplace(make_pair(p,q));
+							vacant.erase(make_pair(p,q));
 							matrix[i][j]=0;
 						}
 					}
@@ -262,7 +231,7 @@ public:
 							p--;
 							matrix[p][q]=matrix[i][j];
 							vacant.insert(make_pair(i,j));
-							vacant.emplace(make_pair(p,q));
+							vacant.erase(make_pair(p,q));
 							matrix[i][j]=0;
 						}
 					}
@@ -270,7 +239,7 @@ public:
 				}
 			}
 		} 
-		else if(key_pressed=='a')
+		else if(key_pressed=='a')				//if left arrow is pressed,move left most tile in a row first
 		{
 			for(int i=0;i<dimension;i++)
 			{
@@ -316,7 +285,7 @@ public:
 							q++;
 							matrix[p][q]=matrix[i][j];
 							vacant.insert(make_pair(i,j));
-							vacant.emplace(make_pair(p,q));
+							vacant.erase(make_pair(p,q));
 							matrix[i][j]=0;
 						}
 					}
@@ -370,7 +339,7 @@ public:
 							q--;
 							matrix[p][q]=matrix[i][j];
 							vacant.insert(make_pair(i,j));
-							vacant.emplace(make_pair(p,q));
+							vacant.erase(make_pair(p,q));
 							matrix[i][j]=0;
 						}
 					}
@@ -381,12 +350,12 @@ public:
 
 	}
 
-	bool getQuit()
+	bool getQuit()							//returns the quit flag
 	{
 		return quit;
 	}
 
-	bool move_possible()		//test this
+	bool move_possible()					//checks if any move is possible,this part is buggy
 	{
 		if(vacant.size()==0)
 		{
@@ -404,7 +373,7 @@ public:
 		return true;
 	}
 
-	void gameover_check()
+	void gameover_check()					//checks if game is over
 	{
 		if(move_possible()==false)
 		{
