@@ -1,3 +1,10 @@
+/*******************************************************************************************************************************
+												TEXT-BASED 2048 GAME
+
+This game is developed on Visual Studio 2012 and works on gcc compiler version 5.3.0 as well.
+THIS IS IN WORKING CONDITION BUT IS NOT THE FINAL VERSION AND NEEDS DEBUGGING.
+********************************************************************************************************************************/
+
 #include<iostream>
 #include<time.h>
 #include<Windows.h>
@@ -10,12 +17,12 @@ class g_2048
 {
 private:
 	int dimension;
-	int **matrix;
-	int score;
+	int **matrix;									
+	int score;										
 	bool quit;
 	char key_pressed;
-	set<pair<int,int> > vacant;
-	int probof2,probof4;
+	set<pair<int,int> > vacant;							//set of unoccupied tiles
+	int probof2,probof4;								//probability of popping tile of 2/tile of 4
 
 public:
 	g_2048(int dim)
@@ -34,7 +41,7 @@ public:
 		score=0;
 		key_pressed='C';
 		quit=false;
-		probof2=90;
+		probof2=95;
 		probof4=100-probof2;
 	}
 
@@ -43,9 +50,9 @@ public:
 		delete matrix;
 	}
 
-	void rand_number_gen()
+	void rand_tile_gen()								//creates new tiles of random value
 	{
-		if(vacant.size()==0)
+		if(vacant.size()==0)							//if board is full,do nothing
 		{
 			return;
 		}
@@ -70,7 +77,7 @@ public:
 		vacant.erase(make_pair(posX,posY));
 	}
 
-	void game_display()
+	void game_display()										//displays the board
 	{
 		//
 		system("cls");
@@ -101,7 +108,7 @@ public:
 
 	void get_input()
 	{
-		while(!kbhit());
+		while(!kbhit());									//wait while the user presses a key
 		key_pressed=getch();
 	}
 
@@ -123,21 +130,21 @@ public:
 		}
 	}
 
-	inline bool inside_matrix(int i,int j)
+	inline bool inside_matrix(int i,int j)						//checks if tile with index (i,j) is within the board
 	{
 		return (i>=0 && i<dimension && j>=0 && j<dimension);
 	}
 
-	void move(char ch)				//moves and combines tiles by value,according to the key pressed
+	void move(char ch)											//moves and combines tiles by value,according to the key pressed
 	{
 		if(key_pressed=='w')
 		{
-			for(int j=0;j<dimension;j++)		//move each tile column-wise in vertical direction starting with first column.
+			for(int j=0;j<dimension;j++)						//move each tile column-wise in vertical direction starting with first column.
 			{
 				//first tile in a column moves up the first and then other tiles in the column follow
 				for(int i=1;i<dimension;i++)
 				{
-					if(matrix[i][j]==0)					//if tile is vacant,do nothing
+					if(matrix[i][j]==0)							//if tile is vacant,do nothing
 						continue;
 					else if(matrix[i][j]==matrix[i-1][j])		//if tile value is equal to upper tile value,merge the two of them in to a tile of twice the value
 					{
@@ -155,24 +162,24 @@ public:
 							p--;
 						}
 
-						if(!inside_matrix(p,q))						//move p into the board if it goes out of the board
+						if(!inside_matrix(p,q))								//move p into the board if it goes out of the board
 							p++;
 
-						if(matrix[p][q]==matrix[i][j])				//if value of vertically next occupied tile is equal to given tile,merge the two
+						if(matrix[p][q]==matrix[i][j])						//if value of vertically next occupied tile is equal to given tile,merge the two
 						{
 							matrix[p][q]*=2;
 							vacant.insert(make_pair(i,j));
 							matrix[i][j]=0;
 							score+=matrix[p][q];
 						}
-						else if(matrix[p][q]==0)					//if tile at the vertical extreme is vacant,shift current tile to its position
+						else if(matrix[p][q]==0)							//if tile at the vertical extreme is vacant,shift current tile to its position
 						{
 							matrix[p][q]=matrix[i][j];
 							vacant.erase(make_pair(p,q));
 							vacant.insert(make_pair(i,j));
 							matrix[i][j]=0;
 						}
-						else                                       //if tile at vertical extreme is of different value,move the current tile to a position vertically below the extreme tile
+						else												//if tile at vertical extreme is of different value,move the current tile to a position vertically below the extreme tile
 						{
 							p++;
 							matrix[p][q]=matrix[i][j];
@@ -239,7 +246,7 @@ public:
 				}
 			}
 		} 
-		else if(key_pressed=='a')				//if left arrow is pressed,move left most tile in a row first
+		else if(key_pressed=='a')							//if left arrow is pressed,move left most tile in a row first
 		{
 			for(int i=0;i<dimension;i++)
 			{
@@ -384,7 +391,7 @@ public:
 
 void game_loop(g_2048 *g)
 {
-	g->rand_number_gen();
+	g->rand_tile_gen();
 	while(1)
 	{
 		g->gameover_check();
@@ -395,13 +402,13 @@ void game_loop(g_2048 *g)
 		g->logic();
 		g->game_display();
 		Sleep(500);
-		g->rand_number_gen();
+		g->rand_tile_gen();
 	}
 }
 
 int main()
 {
-	g_2048 *g=new g_2048(3);
+	g_2048 *g=new g_2048(4);
 
 	game_loop(g);
 
